@@ -99,7 +99,7 @@ public class cefForUe : ModuleRules
         string CEFRoot = Path.Combine(ModuleDirectory, CEFVersion, "win64");
         string LibraryPath = Path.Combine(CEFRoot, "lib");
         List<string> list = new List<string>();
-        list.Add("cefhelper_kill.bat");
+        list.Add("killnoparent.exe");
         InitCEF3_PUB(CEFRoot, CEFVersion, "cefhelper.exe", list);
         MergeFile(CEFRoot);
 
