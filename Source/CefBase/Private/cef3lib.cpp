@@ -94,6 +94,10 @@ void CEF3LIB::LoadCEF3Modules()
 		LoadDllCEF(FPaths::Combine(*libPath, TEXT("libGLESv2.dll")));
 		LoadDllCEF(FPaths::Combine(*libPath, TEXT("libEGL.dll")));
 	}
+	FString killnoParent = FPaths::Combine(*libPath, TEXT("killnoparent.exe"));
+	if (IFileManager::Get().FileExists(*killnoParent)) {
+		system(TCHAR_TO_UTF8(*killnoParent));
+	}
 	FPlatformProcess::PopDllDirectory(*libPath);
 	//const char* api = cef_api_hash(0);
 #elif PLATFORM_LINUX
