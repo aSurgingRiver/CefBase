@@ -135,12 +135,13 @@ public class cefForUe : ModuleRules
         PublicDefinitions.Add("CEF3_UE_ENGINE_VERSION=" + ue_version); //
         PublicDefinitions.Add("CEF3_RENDER=\"cefhelper\""); //
         PublicDefinitions.Add("CEF3_VERSION=\"" + CEFVersion + "\""); //
+        PublicDefinitions.Add("PLATFORM_LINUXAARCH64=0"); //
         PublicDefinitions.Add("CEF_MAC=1"); //
         PrivateRuntimeLibraryPaths.Add(LibraryPath);
         foreach (string FileName in Directory.EnumerateFiles(LibraryPath, "*", SearchOption.AllDirectories))
         {
             if (FileName.EndsWith(".split")) continue;//
-            if (FileName.EndsWith(".dylib"))PublicAdditionalLibraries.Add(FileName);
+            // if (FileName.EndsWith(".dylib"))PublicAdditionalLibraries.Add(FileName);
             if (FileName.EndsWith(".lproj")) AdditionalBundleResources.Add(new BundleResource(FileName,bShouldLog: false));
             RuntimeDependencies.Add(FileName);
         }
