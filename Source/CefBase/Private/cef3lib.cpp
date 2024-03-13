@@ -1,10 +1,16 @@
 
 #include "cef3lib.h"
 #include "GenericPlatform/GenericPlatformProcess.h"
+#include "GenericPlatform/GenericPlatformMisc.h"
 #if PLATFORM_WINDOWS
 #include "Windows/WindowsPlatformProcess.h"
+#include "Windows/WindowsPlatformMisc.h"
 #elif PLATFORM_LINUX
 #include "Linux/LinuxPlatformProcess.h"
+#include "Linux/LinuxPlatformMisc.h"
+#elif PLATFORM_MAC
+#include "Mac/MacPlatformProcess.h"
+#include "Mac/MacPlatformMisc.h"
 #endif
 #include "HAL/FileManager.h"
 #include "Misc/Paths.h"
@@ -35,6 +41,7 @@ class CEF3LIB: public ICEF3LIB {
 public:
 	void LoadCEF3Modules() ;
 	void UnloadCEF3Modules() ;
+	int Branch();
 	FString LibPath() ;
 	virtual ~CEF3LIB() = default;
 private:
@@ -49,11 +56,14 @@ private:
 
 ICEF3LIB* ICEF3LIB::get() {
 	static ICEF3LIB* install= nullptr;
-	//UE_LOG(CoreWebLog, Error, TEXT("CEF3DLL::get"));
+	//UE_LOG(WebViewLog, Error, TEXT("CEF3DLL::get"));
 	if (nullptr == install) {
 		install = new CEF3LIB();
 	}
 	return install;
+}
+int CEF3LIB::Branch() {
+	return CEF3_BRANCH;
 }
 
 void* CEF3LIB::LoadDllCEF(const FString& Path)
@@ -96,26 +106,29 @@ FString CEF3LIB::LibPath() {
 void CEF3LIB::LoadCEF3Modules()
 {
 	if (dllHand.size())return;// has load
-	//UE_LOG(CoreWebLog, Error, TEXT("CEF3DLL::LoadCEF3Modules"));
+	//UE_LOG(WebViewLog, Error, TEXT("CEF3DLL::LoadCEF3Modules"));
 	FString libPath = LibPath();
 #if PLATFORM_WINDOWS
+	FString envPath = FPlatformMisc::GetEnvironmentVariable(TEXT("Path")) + TEXT(";") + libPath;
+	FPlatformMisc::SetEnvironmentVar(TEXT("Path"), *envPath);
 	FPlatformProcess::PushDllDirectory(*libPath);
-	if (LoadDllCEF(FPaths::Combine(*libPath, TEXT("libcef.dll")))) {
-		LoadDllCEF(FPaths::Combine(*libPath, TEXT("chrome_elf.dll")));
-		LoadDllCEF(FPaths::Combine(*libPath, TEXT("d3dcompiler_47.dll")));
-		LoadDllCEF(FPaths::Combine(*libPath, TEXT("libGLESv2.dll")));
-		LoadDllCEF(FPaths::Combine(*libPath, TEXT("libEGL.dll")));
+	if (LoadDllCEF(FPaths::Combine(*libPath, TEXT("chrome_elf.dll")))) {
+		LoadDllCEF(FPaths::Combine(*libPath, TEXT("libcef.dll")));
+		//LoadDllCEF(FPaths::Combine(*libPath, TEXT("d3dcompiler_47.dll")));
+		//LoadDllCEF(FPaths::Combine(*libPath, TEXT("libGLESv2.dll")));
+		//LoadDllCEF(FPaths::Combine(*libPath, TEXT("libEGL.dll")));
 	}
 	FPlatformProcess::PopDllDirectory(*libPath);
 #elif PLATFORM_MAC
+	FString envPath = FPlatformMisc::GetEnvironmentVariable(TEXT("LD_LIBRARY_PATH")) + TEXT(";") + libPath;
+	FPlatformMisc::SetEnvironmentVar(TEXT("LD_LIBRARY_PATH"), *envPath);
 	FString frameWorks = FPaths::Combine(*libPath, TEXT("Chromium Embedded Framework.framework"), TEXT("Chromium Embedded Framework"));
 	if (!cef_load_library(TCHAR_TO_ANSI(*frameWorks))) {
 		UE_LOG(LogTemp, Error, TEXT("Chromium loader initialization failed"));
 	}
 #elif PLATFORM_LINUX
-	FPlatformProcess::PushDllDirectory(*libPath);
-	LoadDllCEF(FPaths::Combine(*libPath, TEXT("libcef.so")));
-	FPlatformProcess::PopDllDirectory(*libPath);
+	FString envPath = FPlatformMisc::GetEnvironmentVariable(TEXT("LD_LIBRARY_PATH")) + TEXT(";") + libPath;
+	FPlatformMisc::SetEnvironmentVar(TEXT("LD_LIBRARY_PATH"), *envPath);
 #endif
 }
 

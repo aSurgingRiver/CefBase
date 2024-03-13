@@ -9,6 +9,7 @@ public:
 	virtual void LoadCEF3Modules() = 0;
 	virtual void UnloadCEF3Modules() = 0;
 	virtual FString LibPath() = 0;
+	virtual int Branch() = 0;
 };
 
 
