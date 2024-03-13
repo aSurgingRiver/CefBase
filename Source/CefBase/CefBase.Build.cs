@@ -7,9 +7,9 @@ public class CefBase : ModuleRules
 	public CefBase(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+        if (Target.Version.MajorVersion < 5) CppStandard = CppStandardVersion.Cpp17;
         string CEFRoot = Path.Combine(ModuleDirectory, "Public");
         PublicSystemIncludePaths.Add(Path.Combine(CEFRoot));
-    if (Target.Version.MajorVersion<5)CppStandard = CppStandardVersion.Cpp17;
 		PublicIncludePaths.AddRange(
 			new string[] {
 				// ... add public include paths required here ...

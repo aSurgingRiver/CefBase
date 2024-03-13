@@ -13,7 +13,7 @@ public class cefForUe : ModuleRules
     {
         Type = ModuleType.External;
         //PrintConfig("cefForUe");
-        //Console.WriteLine(Target.bBuildEditor ? "editor":"runtime");
+        //Console.WriteLine(ProjectDir + "===================");
         if (Target.Platform == UnrealTargetPlatform.Win64) {
             InitCEF3_Win("cef_120.6099");
         }
@@ -73,10 +73,14 @@ public class cefForUe : ModuleRules
         //string CEFRoot = Path.Combine(ModuleDirectory, CEFVersion, platform);
         string LibraryPath = Path.Combine(CEFRoot,"lib");
         MergeFile(CEFRoot);
+        string[] branchs = CEFVersion.Split('.'); 
+        string branch ="";
+        if (2 <= branchs.Length) branch = branchs[1];
         Int32 ue_version = Target.Version.MajorVersion*10000+Target.Version.MinorVersion*100+Target.Version.PatchVersion;
         PublicSystemIncludePaths.Add(Path.Combine(CEFRoot));
         PublicDefinitions.Add("CEF3_RENDER=\"" + renderName + "\""); //
         PublicDefinitions.Add("CEF3_VERSION=\"" + CEFVersion + "\""); //
+        PublicDefinitions.Add("CEF3_BRANCH=" + branch + ""); //
         PublicDefinitions.Add("CEF3_UE_ENGINE_VERSION=" + ue_version ); //
         //List<string> Dlls = new List<string>();
         Dlls.Add("icudtl.dat");
@@ -92,7 +96,6 @@ public class cefForUe : ModuleRules
         }
         foreach (string FileName in Directory.EnumerateFiles(LibraryPath, "*.pak", SearchOption.AllDirectories))
         {
-            string DependencyName = FileName.Substring(Target.UEThirdPartyBinariesDirectory.Length).Replace('\\', '/');
             RuntimeDependencies.Add(FileName);
         }
         RuntimeDependencies.Add(Path.Combine(LibraryPath, renderName));
@@ -129,10 +132,15 @@ public class cefForUe : ModuleRules
         PublicSystemIncludePaths.Add(Path.Combine(CEFRoot));
         PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, "libcef_dll_wrapper.a"));
 
+        string[] branchs = CEFVersion.Split('.');
+        string branch = "";
+        if (2 <= branchs.Length) branch = branchs[1];
+
         Int32 ue_version = Target.Version.MajorVersion * 10000 + Target.Version.MinorVersion * 100 + Target.Version.PatchVersion;
         PublicDefinitions.Add("CEF3_UE_ENGINE_VERSION=" + ue_version); //
         PublicDefinitions.Add("CEF3_RENDER=\"cefhelper\""); //
         PublicDefinitions.Add("CEF3_VERSION=\"" + CEFVersion + "\""); //
+        PublicDefinitions.Add("CEF3_BRANCH=" + branch + ""); //
         PublicDefinitions.Add("PLATFORM_LINUXAARCH64=0"); //
         PublicDefinitions.Add("CEF_MAC=1"); //
         PrivateRuntimeLibraryPaths.Add(LibraryPath);
@@ -154,7 +162,7 @@ public class cefForUe : ModuleRules
         Dlls.Add("libvulkan.so.1");
         InitCEF3_PUB(CEFRoot, CEFVersion, "cefhelper", Dlls);
         //MergeFile(CEFRoot);
-
+        String ProjectBin = Path.Combine(Path.GetDirectoryName(Target.ProjectFile.ToString()), "Binaries", "Linux");
         PublicDefinitions.Add("CEF_LINUX=1"); //
         PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, "libcef_dll_wrapper.a"));
         PrivateRuntimeLibraryPaths.Add(LibraryPath);
