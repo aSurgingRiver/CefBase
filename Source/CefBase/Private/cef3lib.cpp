@@ -120,14 +120,14 @@ void CEF3LIB::LoadCEF3Modules()
 	}
 	FPlatformProcess::PopDllDirectory(*libPath);
 #elif defined CEF_MAC
-	FString envPath = FPlatformMisc::GetEnvironmentVariable(TEXT("LD_LIBRARY_PATH")) + TEXT(";") + libPath;
+	FString envPath = FPlatformMisc::GetEnvironmentVariable(TEXT("LD_LIBRARY_PATH")) + TEXT(":") + libPath;
 	FPlatformMisc::SetEnvironmentVar(TEXT("LD_LIBRARY_PATH"), *envPath);
 	FString frameWorks = FPaths::Combine(*libPath, TEXT("Chromium Embedded Framework.framework"), TEXT("Chromium Embedded Framework"));
 	if (!cef_load_library(TCHAR_TO_ANSI(*frameWorks))) {
 		UE_LOG(LogTemp, Error, TEXT("Chromium loader initialization failed"));
 	}
 #elif defined CEF_LINUX
-	FString envPath = FPlatformMisc::GetEnvironmentVariable(TEXT("LD_LIBRARY_PATH")) + TEXT(";") + libPath;
+	FString envPath = FPlatformMisc::GetEnvironmentVariable(TEXT("LD_LIBRARY_PATH")) + TEXT(":") + libPath;
 	FPlatformMisc::SetEnvironmentVar(TEXT("LD_LIBRARY_PATH"), *envPath);
 #endif
 }
